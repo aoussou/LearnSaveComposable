@@ -7,8 +7,8 @@ import android.os.Looper
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -16,11 +16,12 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.layout.boundsInRoot
-import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.core.graphics.applyCanvas
 import com.talisol.learnsavecomposable.ui.theme.LearnSaveComposableTheme
 import java.io.File
@@ -31,13 +32,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             LearnSaveComposableTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    Greeting("Android")
-                }
+
+                Greeting("piu")
+
             }
         }
     }
@@ -47,68 +44,41 @@ class MainActivity : ComponentActivity() {
 fun Greeting(name: String) {
 
 
-    val view = LocalView.current
-    var capturingViewBounds by remember { mutableStateOf<Rect?>(null) }
-    Button(onClick = {
-        val bounds = capturingViewBounds ?: return@Button
-        val image = Bitmap.createBitmap(
-            bounds.width.roundToInt(), bounds.height.roundToInt(),
-            Bitmap.Config.ARGB_8888
-        ).applyCanvas {
-            translate(-bounds.left, -bounds.top)
-            view.draw(this)
-        }
-    }) {
-        Text("Capture")
-    }
     Column(
         modifier = Modifier
-            .onGloballyPositioned {
-                capturingViewBounds = it.boundsInRoot()
-            }
+            .fillMaxSize(.25f)
+//            .onGloballyPositioned {
+//                var bounds = it.boundsInRoot()
+//
+//                Log.i("DEBUG0", bounds.width.toString())
+//                Log.i("DEBUG0", bounds.height.toString())
+//            }
     ) {
-
-        Text("Geki")
-
-        Text("Kawa")
-
-    }
-
-
-    Column() {
         val view = LocalView.current
         val context = LocalContext.current
 
-        val handler = Handler(Looper.getMainLooper())
+            val handler = Handler(Looper.getMainLooper())
+            handler.postDelayed(Runnable {
 
-        Log.i("DEBUG",context.filesDir.toString())
+                Log.i("DEBUG1", view.width.toString())
+                Log.i("DEBUG1", view.height.toString())
 
-        handler.postDelayed(Runnable {
-            val bmp = Bitmap.createBitmap(view.width, view.height,
-                Bitmap.Config.ARGB_8888).applyCanvas {
-                view.draw(this)
-            }
-            bmp.let {
-                File(context.filesDir, "screenshot.png")
-                    .writeBitmap(bmp, Bitmap.CompressFormat.PNG, 85)
-            }
-        }, 1000)
-
-        Text(text = "Hello $name!")
-    }
+                val bmp = Bitmap.createBitmap(view.width, view.height,
+                    Bitmap.Config.ARGB_8888).applyCanvas {
+                    view.draw(this)
+                }
+                bmp.let {
+                    File(context.filesDir, "screenshot.png")
+                        .writeBitmap(bmp, Bitmap.CompressFormat.PNG, 85)
+                }
+            }, 1000)
+            Text(text = "Hello $name!")
+        }
 
 
 }
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    LearnSaveComposableTheme {
-        Greeting("Android")
-    }
-}
-
-private fun File.writeBitmap(bitmap: Bitmap, format: Bitmap.CompressFormat, quality: Int) {
+fun File.writeBitmap(bitmap: Bitmap, format: Bitmap.CompressFormat, quality: Int) {
     outputStream().use { out ->
         bitmap.compress(format, quality, out)
         out.flush()
